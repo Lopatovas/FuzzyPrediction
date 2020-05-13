@@ -7,4 +7,5 @@ setup(
    author='Edgaras Lopatovas',
    author_email='lopatovas@gmail.com',
    packages=['FuzzyPrediction'],
+   install_requires=['numpy']
 )
