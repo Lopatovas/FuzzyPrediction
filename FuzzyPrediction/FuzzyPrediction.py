@@ -105,7 +105,7 @@ def driver():
     playerFuzzyValues = getAllFuzzyValues([195, 30, 2096, 28])
     playerFuzzyValuesAfterRules = fuzzyRules(playerFuzzyValues)
     aggregated = aggregateAnswers(playerFuzzyValuesAfterRules)
-    print(meanOfMaximum(aggregated))
-    print(centroid(aggregated))
+    print('{} {}'.format('Mean of maximum:', meanOfMaximum(aggregated)))
+    print('{} {}'.format('Centroid:',centroid(aggregated)))
 
 driver()
