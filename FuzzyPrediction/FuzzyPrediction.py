@@ -53,16 +53,59 @@ def aggregateAnswers(input):
     aggregatedRules.append(max(input[:7]))
     aggregatedRules.append(max(input[7:16]))
     aggregatedRules.append(max(input[16:]))
-    return aggregatedRules
+    index = 0
+    x = numpy.arange(0, 100, 0.01)
+    y = numpy.zeros(len(x))
+    for params in dependencyFunctionConfig.LIKELYHOOD_PARAMS:
+        if len(params) == 4:
+            figure = fuzzySetUtils.trapezoidOutputHelper(x, params)
+            figure[figure > aggregatedRules[index]] = aggregatedRules[index]
+        elif len(params) == 3:
+            figure = fuzzySetUtils.triangleOutputHelper(x, params)
+            figure[figure > aggregatedRules[index]] = aggregatedRules[index]
+        y = numpy.maximum(y, figure)
+        index += 1
+    return y
 
 def meanOfMaximum(y):
-    return numpy.mean(y)
+    x = numpy.arange(0, 100, 0.01)
+    return numpy.mean(x[y == y.max()])
+
+def centroid(y):
+    x = numpy.arange(0, 100, 0.01)
+    sumCenterArea = 0.0
+    sumArea = 0.0
+
+    for i in range(1, len(x)):
+        x1 = x[i - 1]
+        x2 = x[i]
+        y1 = y[i - 1]
+        y2 = y[i]
+
+        if not(y1 == y2 == 0.0):
+            if y1 == y2: 
+                center = 0.5 * (x1 + x2)
+                area = (x2 - x1) * y1
+            elif y1 == 0.0 and y2 != 0.0:
+                center = 2.0 / 3.0 * (x2-x1) + x1 
+                area = 0.5 * (x2 - x1) * y2
+            elif y2 == 0.0 and y1 != 0.0:
+                center = 1.0 / 3.0 * (x2 - x1) + x1
+                area = 0.5 * (x2 - x1) * y1
+            else: 
+                center = (2.0 / 3.0 * (x2-x1) * (y2 + 0.5*y1)) / (y1+y2) + x1
+                area = 0.5 * (x2 - x1) * (y1 + y2)
+
+            sumCenterArea += center * area
+            sumArea += area
+
+    return sumCenterArea / sumArea
 
 def driver():
     playerFuzzyValues = getAllFuzzyValues([195, 30, 2096, 28])
     playerFuzzyValuesAfterRules = fuzzyRules(playerFuzzyValues)
-    aggregatedRules = aggregateAnswers(playerFuzzyValuesAfterRules)
-    print(aggregatedRules)
-    print(meanOfMaximum(aggregatedRules))
+    aggregated = aggregateAnswers(playerFuzzyValuesAfterRules)
+    print(meanOfMaximum(aggregated))
+    print(centroid(aggregated))
 
 driver()
